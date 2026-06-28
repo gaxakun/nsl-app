@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSL Sign Recogniser</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">🤟 NSL Recogniser</div>
+        <div class="badge">Live · Nigerian Sign Language</div>
+    </div>
+</header>
+
+<main class="main">
+
+    <!-- Camera Section -->
+    <section class="camera-card">
+        <div class="video-wrapper">
+            <video id="webcam" autoplay playsinline muted></video>
+            <canvas id="output-canvas"></canvas>
+            <div class="palm-toast" id="palm-toast">✋ Space added!</div>
+        </div>
+        <div class="camera-footer">
+            <div class="status-row">
+                <span class="dot"></span>
+                <span id="status-text">Starting...</span>
+                <button class="btn btn-switch-camera" id="switch-camera-btn" title="Switch front/back camera">🔄 Switch Camera</button>
+            </div>
+            <div class="hold-ring-wrap">
+                <div class="hold-ring" id="hold-ring">
+                    <div class="hold-inner" id="hold-inner">HOLD</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="right-panel">
+
+        <div class="card prediction-card">
+            <p class="card-label">Detected Letter</p>
+            <div class="prediction-row">
+                <span class="big-letter" id="prediction">—</span>
+                <div class="confidence-col">
+                    <span class="conf-num" id="probability">0%</span>
+                    <span class="conf-label">Confidence</span>
+                </div>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill" id="bar-fill"></div>
+            </div>
+        </div>
+
+        <div class="card sentence-card">
+            <p class="card-label">Sentence Builder</p>
+            <div class="sentence-display" id="sentence">_</div>
+            <div class="btn-row">
+                <button class="btn btn-space" id="space-btn">Space</button>
+                <button class="btn btn-delete" id="delete-btn">⌫</button>
+                <button class="btn btn-clear" id="clear-btn">Clear</button>
+            </div>
+        </div>
+
+        <div class="card tips-card">
+            <p class="card-label">How To Sign</p>
+            <ul class="tips-list">
+                <li>Hold a letter sign steady for <strong>2 seconds</strong> to add it</li>
+                <li>Show an <strong>open palm</strong> for 2 seconds to add a space</li>
+                <li>Use <strong>⌫</strong> to delete the last character</li>
+                <li>Good lighting = better accuracy</li>
+            </ul>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>NSL Sign Recogniser &copy; 2026 · TensorFlow.js + MediaPipe</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
