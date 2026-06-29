@@ -99,8 +99,8 @@ function isOpenPalm(landmarks) {
 async function loadModel() {
     try {
         statusText.textContent = 'Loading model...';
-        // point to your NSL-only model folder
-       model = await tf.loadGraphModel('model/model.json');
+        // Updated path to the new NSL-only model
+        model = await tf.loadGraphModel('model_nsl/model.json');
         statusText.textContent = 'Model ready · Camera active';
     } catch (err) {
         statusText.textContent = 'Model load failed — check console';
