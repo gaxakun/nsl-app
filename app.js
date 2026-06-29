@@ -292,13 +292,41 @@ async function startCamera() {
         }
         if (video.srcObject) {
             video.srcObject.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: 640, height: 480, facingMode: currentFacingMode },
-            audio: false
-        });
+        // FIX (iOS): iPhone cameras need a brief moment to fully release after
+        // stop() before a new getUserMedia call can claim them. Without this delay,
+        // iOS Safari can silently fail or throw NotReadableError on switch.
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        let stream;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480, facingMode: currentFacingMode },
+                audio: false
+            });
+        } catch (constraintErr) {
+            // FIX (iOS): some iPhones (esp. multi-lens models) reject the exact
+            // width/height + facingMode combo for the back camera with
+            // OverconstrainedError. Retry with just facingMode, no fixed resolution.
+            console.warn('[NSL] Exact constraints failed, retrying with relaxed constraints:', constraintErr);
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: currentFacingMode },
+                audio: false
+            });
+        }
+
         video.srcObject = stream;
+
+        // FIX (iOS): swapping srcObject can leave the video element paused on
+        // Safari instead of auto-resuming. Explicitly call play() and ignore
+        // benign AbortError if the user switches again before it resolves.
+        try {
+            await video.play();
+        } catch (playErr) {
+            console.warn('[NSL] video.play() did not resolve immediately:', playErr);
+        }
 
         cameraInstance = new Camera(video, {
             onFrame: async () => { await hands.send({ image: video }); },
